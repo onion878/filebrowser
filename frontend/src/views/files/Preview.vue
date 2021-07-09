@@ -96,7 +96,7 @@
               <i class="material-icons">file_download</i>
             </h2>
           </a>
-          <a @click="previewFile(downloadUrl)">
+          <a @click="previewFile(downloadUrl)" href="javascript:void(0)">
             <h2 class="message">
               {{ $t("sidebar.preview") }}
               <i class="material-icons">visibility</i>
