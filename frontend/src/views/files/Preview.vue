@@ -1,47 +1,47 @@
 <template>
   <div
-    id="previewer"
-    @mousemove="toggleNavigation"
-    @touchstart="toggleNavigation"
+      id="previewer"
+      @mousemove="toggleNavigation"
+      @touchstart="toggleNavigation"
   >
     <header-bar>
-      <action icon="close" :label="$t('buttons.close')" @action="close()" />
+      <action icon="close" :label="$t('buttons.close')" @action="close()"/>
       <title>{{ name }}</title>
       <action
-        :disabled="loading"
-        v-if="isResizeEnabled && req.type === 'image'"
-        :icon="fullSize ? 'photo_size_select_large' : 'hd'"
-        @action="toggleSize"
+          :disabled="loading"
+          v-if="isResizeEnabled && req.type === 'image'"
+          :icon="fullSize ? 'photo_size_select_large' : 'hd'"
+          @action="toggleSize"
       />
 
       <template #actions>
         <action
-          :disabled="loading"
-          v-if="user.perm.rename"
-          icon="mode_edit"
-          :label="$t('buttons.rename')"
-          show="rename"
+            :disabled="loading"
+            v-if="user.perm.rename"
+            icon="mode_edit"
+            :label="$t('buttons.rename')"
+            show="rename"
         />
         <action
-          :disabled="loading"
-          v-if="user.perm.delete"
-          icon="delete"
-          :label="$t('buttons.delete')"
-          @action="deleteFile"
-          id="delete-button"
+            :disabled="loading"
+            v-if="user.perm.delete"
+            icon="delete"
+            :label="$t('buttons.delete')"
+            @action="deleteFile"
+            id="delete-button"
         />
         <action
-          :disabled="loading"
-          v-if="user.perm.download"
-          icon="file_download"
-          :label="$t('buttons.download')"
-          @action="download"
+            :disabled="loading"
+            v-if="user.perm.download"
+            icon="file_download"
+            :label="$t('buttons.download')"
+            @action="download"
         />
         <action
-          :disabled="loading"
-          icon="info"
-          :label="$t('buttons.info')"
-          show="info"
+            :disabled="loading"
+            icon="info"
+            :label="$t('buttons.info')"
+            show="info"
         />
       </template>
     </header-bar>
@@ -57,64 +57,72 @@
       <div class="preview">
         <ExtendedImage v-if="req.type == 'image'" :src="raw"></ExtendedImage>
         <audio
-          v-else-if="req.type == 'audio'"
-          ref="player"
-          :src="raw"
-          controls
-          :autoplay="autoPlay"
-          @play="autoPlay = true"
+            v-else-if="req.type == 'audio'"
+            ref="player"
+            :src="raw"
+            controls
+            :autoplay="autoPlay"
+            @play="autoPlay = true"
         ></audio>
         <video
-          v-else-if="req.type == 'video'"
-          ref="player"
-          :src="raw"
-          controls
-          :autoplay="autoPlay"
-          @play="autoPlay = true"
+            v-else-if="req.type == 'video'"
+            ref="player"
+            :src="raw"
+            controls
+            :autoplay="autoPlay"
+            @play="autoPlay = true"
         >
           <track
-            kind="captions"
-            v-for="(sub, index) in subtitles"
-            :key="index"
-            :src="sub"
-            :label="'Subtitle ' + index"
-            :default="index === 0"
+              kind="captions"
+              v-for="(sub, index) in subtitles"
+              :key="index"
+              :src="sub"
+              :label="'Subtitle ' + index"
+              :default="index === 0"
           />
           Sorry, your browser doesn't support embedded videos, but don't worry,
           you can <a :href="downloadUrl">download it</a>
           and watch it with your favorite video player!
         </video>
         <object
-          v-else-if="req.extension.toLowerCase() == '.pdf'"
-          class="pdf"
-          :data="raw"
+            v-else-if="req.extension.toLowerCase() == '.pdf'"
+            class="pdf"
+            :data="raw"
         ></object>
-        <a v-else-if="req.type == 'blob'" :href="downloadUrl">
-          <h2 class="message">
-            {{ $t("buttons.download") }}
-            <i class="material-icons">file_download</i>
-          </h2>
-        </a>
+        <template v-else-if="req.type == 'blob'">
+          <a :href="downloadUrl">
+            <h2 class="message">
+              {{ $t("buttons.download") }}
+              <i class="material-icons">file_download</i>
+            </h2>
+          </a>
+          <a @click="previewFile(downloadUrl)">
+            <h2 class="message">
+              {{ $t("sidebar.preview") }}
+              <i class="material-icons">visibility</i>
+            </h2>
+          </a>
+        </template>
       </div>
     </template>
 
     <button
-      @click="prev"
-      @mouseover="hoverNav = true"
-      @mouseleave="hoverNav = false"
-      :class="{ hidden: !hasPrevious || !showNav }"
-      :aria-label="$t('buttons.previous')"
-      :title="$t('buttons.previous')"
+        @click="prev"
+        @mouseover="hoverNav = true"
+        @mouseleave="hoverNav = false"
+        :class="{ hidden: !hasPrevious || !showNav }"
+        :aria-label="$t('buttons.previous')"
+        :title="$t('buttons.previous')"
     >
       <i class="material-icons">chevron_left</i>
     </button>
     <button
-      @click="next"
-      @mouseover="hoverNav = true"
-      @mouseleave="hoverNav = false"
-      :class="{ hidden: !hasNext || !showNav }"
-      :aria-label="$t('buttons.next')"
-      :title="$t('buttons.next')"
+        @click="next"
+        @mouseover="hoverNav = true"
+        @mouseleave="hoverNav = false"
+        :class="{ hidden: !hasNext || !showNav }"
+        :aria-label="$t('buttons.next')"
+        :title="$t('buttons.next')"
     >
       <i class="material-icons">chevron_right</i>
     </button>
@@ -122,9 +130,9 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
-import { files as api } from "@/api";
-import { baseURL, resizePreview } from "@/utils/constants";
+import {mapState} from "vuex";
+import {files as api} from "@/api";
+import {baseURL, resizePreview} from "@/utils/constants";
 import url from "@/utils/url";
 import throttle from "lodash.throttle";
 
@@ -165,7 +173,7 @@ export default {
     },
     downloadUrl() {
       return `${baseURL}/api/raw${url.encodePath(this.req.path)}?auth=${
-        this.jwt
+          this.jwt
       }`;
     },
     previewUrl() {
@@ -174,7 +182,7 @@ export default {
 
       if (this.req.type === "image" && !this.fullSize) {
         return `${baseURL}/api/preview/big${url.encodePath(
-          this.req.path
+            this.req.path
         )}?k=${key}`;
       }
       return `${baseURL}/api/raw${url.encodePath(this.req.path)}?k=${key}`;
@@ -222,11 +230,11 @@ export default {
     },
     prev() {
       this.hoverNav = false;
-      this.$router.push({ path: this.previousLink });
+      this.$router.push({path: this.previousLink});
     },
     next() {
       this.hoverNav = false;
-      this.$router.push({ path: this.nextLink });
+      this.$router.push({path: this.nextLink});
     },
     key(event) {
       if (this.show !== null) {
@@ -246,16 +254,16 @@ export default {
     },
     async updatePreview() {
       if (
-        this.$refs.player &&
-        this.$refs.player.paused &&
-        !this.$refs.player.ended
+          this.$refs.player &&
+          this.$refs.player.paused &&
+          !this.$refs.player.ended
       ) {
         this.autoPlay = false;
       }
 
       if (this.req.subtitles) {
         this.subtitles = this.req.subtitles.map(
-          (sub) => `${baseURL}/api/raw${sub}?inline=true`
+            (sub) => `${baseURL}/api/raw${sub}?inline=true`
         );
       }
 
@@ -322,11 +330,14 @@ export default {
       this.$store.commit("updateRequest", {});
 
       let uri = url.removeLastDir(this.$route.path) + "/";
-      this.$router.push({ path: uri });
+      this.$router.push({path: uri});
     },
     download() {
       api.download(null, this.$route.path);
     },
+    previewFile(url) {
+      window.open(window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + '/onlinePreview?url=' + window.location.origin + url);
+    }
   },
 };
 </script>
