@@ -336,7 +336,7 @@ export default {
       api.download(null, this.$route.path);
     },
     previewFile(url) {
-      window.open(window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + '/onlinePreview?url=' + window.location.origin + url);
+      window.open(window.location.protocol + '//' + window.location.hostname + ':8012/onlinePreview?url=' + window.location.origin + url);
     }
   },
 };
